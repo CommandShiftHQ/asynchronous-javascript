@@ -20,3 +20,13 @@ it('GET /jokes should respond with a jokes message', done => {
       done();
     });
 });
+
+it('GET /joke/random should respond with a jokes message', done => {
+  request(app)
+    .get('/joke/random')
+    .then(res => {
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.message).toEqual('Reached the random joke endpoint');
+      done();
+    });
+});
