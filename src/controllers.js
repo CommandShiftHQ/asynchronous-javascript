@@ -13,8 +13,14 @@ const randomJokeController = (req, res) =>
     message: 'Reached the random joke endpoint',
   });
 
+const personalJokeController = (req, res) =>
+  res.send({
+    message: 'Reached the personal joke endpoint',
+  });
+
 module.exports = {
   mainController,
   jokesController,
   randomJokeController,
+  personalJokeController,
 };
