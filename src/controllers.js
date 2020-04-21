@@ -10,8 +10,7 @@ const mainController = (req, res) =>
 const jokesController = (req, res) =>
   request('https://api.icndb.com/jokes', (error, jokesApiResponse) => {
     if (error) {
-      // eslint-disable-next-line
-      console.log(error);
+      return res.status(error.statusCode).send({ error: error.message });
     }
 
     const parsedResponse = JSON.parse(jokesApiResponse.body);
