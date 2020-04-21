@@ -16,45 +16,61 @@ it('GET / should respond with a welcome message', done => {
     });
 });
 
-it('GET /jokes should respond with a jokes message', done => {
-  const mockResponse = {
-    type: 'success',
-    value: [
-      {
-        id: 1,
-        joke: 'i am a joke',
-        categories: [],
-      },
-      {
-        id: 2,
-        joke: 'i am another joke',
-        categories: [],
-      },
-    ],
-  };
-
-  nock('https://api.icndb.com')
-    .get('/jokes')
-    .reply(200, mockResponse);
-
-  request(app)
-    .get('/jokes')
-    .then(res => {
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.jokes).toEqual([
+describe('GET /jokes', () => {
+  it('should respond with a jokes message', done => {
+    const mockResponse = {
+      type: 'success',
+      value: [
         {
-          categories: [],
           id: 1,
           joke: 'i am a joke',
+          categories: [],
         },
         {
-          categories: [],
           id: 2,
           joke: 'i am another joke',
+          categories: [],
         },
-      ]);
-      done();
-    });
+      ],
+    };
+
+    nock('https://api.icndb.com')
+      .get('/jokes')
+      .reply(200, mockResponse);
+
+    request(app)
+      .get('/jokes')
+      .then(res => {
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.jokes).toEqual([
+          {
+            categories: [],
+            id: 1,
+            joke: 'i am a joke',
+          },
+          {
+            categories: [],
+            id: 2,
+            joke: 'i am another joke',
+          },
+        ]);
+        done();
+      });
+  });
+
+  it('should responde with an error message if something goes wrong', done => {
+    nock('https://api.icndb.com')
+      .get('/jokes')
+      .replyWithError({ statusCode: 500, message: 'huge error' });
+
+    request(app)
+      .get('/jokes')
+      .then(res => {
+        expect(res.statusCode).toEqual(500);
+        expect(res.body.error).toEqual('huge error');
+        done();
+      });
+  });
 });
 
 it('GET /joke/random should respond with a random joke message', done => {
