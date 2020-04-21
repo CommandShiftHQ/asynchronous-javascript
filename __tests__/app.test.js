@@ -5,62 +5,34 @@
 const request = require('supertest');
 const nock = require('nock');
 const app = require('../src/app');
+const { mockListOfJokes, mockRandomJoke, mockPersonalJoke } = require('../data/test-data');
 
 describe('GET / - Homepage', () => {
-  it('should respond with some homepage markup', done => {
+  it('should respond with some homepage markup', async () => {
     request(app)
       .get('/')
       .then(res => {
         expect(res.statusCode).toEqual(200);
         expect(res.text).toContain('Hello, Welcome to My jokes API');
-        done();
       });
   });
 });
 
 describe('GET /jokes', () => {
-  it('should respond with a jokes message', done => {
-    const mockResponse = {
-      type: 'success',
-      value: [
-        {
-          id: 1,
-          joke: 'i am a joke',
-          categories: [],
-        },
-        {
-          id: 2,
-          joke: 'i am another joke',
-          categories: [],
-        },
-      ],
-    };
-
+  it('should respond with a jokes message', async () => {
     nock('https://api.icndb.com')
       .get('/jokes')
-      .reply(200, mockResponse);
+      .reply(200, mockListOfJokes);
 
     request(app)
       .get('/jokes')
       .then(res => {
         expect(res.statusCode).toEqual(200);
-        expect(res.body.jokes).toEqual([
-          {
-            categories: [],
-            id: 1,
-            joke: 'i am a joke',
-          },
-          {
-            categories: [],
-            id: 2,
-            joke: 'i am another joke',
-          },
-        ]);
-        done();
+        expect(res.body.jokes).toEqual(mockListOfJokes.value);
       });
   });
 
-  it('should respond with an error message if something goes wrong', done => {
+  it('should respond with an error message if something goes wrong', async () => {
     nock('https://api.icndb.com')
       .get('/jokes')
       .replyWithError({ statusCode: 500, message: 'huge error' });
@@ -70,41 +42,26 @@ describe('GET /jokes', () => {
       .then(res => {
         expect(res.statusCode).toEqual(500);
         expect(res.body.error).toEqual('huge error');
-        done();
       });
   });
 });
 
 describe('GET /joke/random', () => {
-  it('should respond with a random joke message', done => {
-    const mockResponse = {
-      type: 'success',
-      value: {
-        id: 115,
-        joke: 'i am a random joke',
-        categories: [],
-      },
-    };
-
+  it('should respond with a random joke message', async () => {
     nock('https://api.icndb.com')
       .get('/jokes/random')
       .query({ exclude: '[explicit]' })
-      .reply(200, mockResponse);
+      .reply(200, mockRandomJoke);
 
     request(app)
       .get('/joke/random')
       .then(res => {
         expect(res.statusCode).toEqual(200);
-        expect(res.body.randomJoke).toEqual({
-          categories: [],
-          id: 115,
-          joke: 'i am a random joke',
-        });
-        done();
+        expect(res.body.randomJoke).toEqual(mockRandomJoke.value);
       });
   });
 
-  it('should respond with an error message if something goes wrong', done => {
+  it('should respond with an error message if something goes wrong', async () => {
     nock('https://api.icndb.com')
       .get('/jokes/random')
       .query({ exclude: '[explicit]' })
@@ -115,32 +72,22 @@ describe('GET /joke/random', () => {
       .then(res => {
         expect(res.statusCode).toEqual(404);
         expect(res.body.error).toEqual('Unknown resource');
-        done();
       });
   });
 });
 
 describe('GET /joke/random/personal', () => {
   it('should respond with a personal joke message', async () => {
-    const mockResponse = {
-      type: 'success',
-      value: {
-        id: 141,
-        joke: 'random joke about manchester codes',
-        categories: [],
-      },
-    };
-
     nock('https://api.icndb.com')
       .get('/jokes/random')
       .query({ exclude: '[explicit]', firstName: 'manchester', lastName: 'codes' })
-      .reply(200, mockResponse);
+      .reply(200, mockPersonalJoke);
 
     request(app)
       .get('/joke/personal/manchester/codes')
       .then(res => {
         expect(res.statusCode).toEqual(200);
-        expect(res.body.personalJoke).toEqual(mockResponse.value);
+        expect(res.body.personalJoke).toEqual(mockPersonalJoke.value);
       });
   });
 
