@@ -19,7 +19,7 @@ describe('GET / - Homepage', () => {
 });
 
 describe('GET /jokes', () => {
-  it('should respond with a jokes message', async () => {
+  it('should respond with a list of jokes', async () => {
     nock('https://api.icndb.com')
       .get('/jokes')
       .reply(200, mockListOfJokes);
@@ -47,7 +47,7 @@ describe('GET /jokes', () => {
 });
 
 describe('GET /joke/random', () => {
-  it('should respond with a random joke message', async () => {
+  it('should respond with a random joke', async () => {
     nock('https://api.icndb.com')
       .get('/jokes/random')
       .query({ exclude: '[explicit]' })
@@ -77,7 +77,7 @@ describe('GET /joke/random', () => {
 });
 
 describe('GET /joke/random/personal', () => {
-  it('should respond with a personal joke message', async () => {
+  it('should respond with a personal joke', async () => {
     nock('https://api.icndb.com')
       .get('/jokes/random')
       .query({ exclude: '[explicit]', firstName: 'manchester', lastName: 'codes' })
